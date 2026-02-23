@@ -22,21 +22,18 @@
 </head>
 <body>
     <div id="app" class="max-w-md mx-auto p-4 pb-10">
-        <!-- Header -->
         <header class="flex justify-between items-center mb-6 pt-2">
-            <div class="flex items-center gap-3">
-                <div>
-                    <h1 class="text-lg font-bold leading-tight">Nova_Banana🍌</h1>
-                    <p id="user-info" class="text-[10px] text-gray-400">Detecting User...</p>
-                </div>
+            <div>
+                <h1 class="text-lg font-bold">Nova_Banana🍌 Agency</h1>
+                <p id="user-info" class="text-[10px] text-gray-400">Detecting User...</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="toggleLang()" id="lang-btn" class="text-[10px] bg-white/10 px-2 py-1 rounded">Burmese 🇲🇲</button>
                 <select id="curr-selector" onchange="updateUI()" class="bg-[#2c2c2e] text-[10px] px-1 py-1 rounded border border-white/10">
                     <option value="MYR">MYR (RM)</option>
-                    <option value="MMK">MMK (Ks)</option>
-                    <option value="THB">THB (฿)</option>
                     <option value="USD">USD ($)</option>
+                    <option value="THB">THB (฿)</option>
+                    <option value="MMK">MMK (Ks)</option>
                 </select>
             </div>
         </header>
@@ -44,7 +41,6 @@
         <h2 id="title-text" class="text-xl font-bold text-center mb-6">Choose Your Plan</h2>
 
         <div id="packs-container">
-            <!-- Premium -->
             <div class="pricing-card selected" onclick="selectPack(15, this, false)">
                 <span class="tag" id="tag-best">Best Value</span>
                 <div class="flex justify-between items-center">
@@ -52,8 +48,6 @@
                     <div id="price-1" class="text-lg font-black"></div>
                 </div>
             </div>
-            
-            <!-- Enterprise -->
             <div class="pricing-card" onclick="selectPack(50, this, false)">
                 <span class="tag" id="tag-agency">Agency</span>
                 <div class="flex justify-between items-center">
@@ -61,8 +55,6 @@
                     <div id="price-2" class="text-lg font-black"></div>
                 </div>
             </div>
-
-            <!-- Custom Pack -->
             <div class="pricing-card" id="custom-card" onclick="selectPack(100, this, true)">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-3"><span>⚙️</span><div><h3 class="font-bold text-sm" id="pack3-name">Custom Pack</h3><p class="text-xs opacity-50" id="custom-credits-label">100 Credits</p></div></div>
@@ -75,14 +67,16 @@
             </div>
         </div>
 
-        <div id="paypal-button-container" class="mt-6"></div>
+        <!-- ⚠️ PayPal Button Container with Loading Text -->
+        <div id="paypal-button-container" class="mt-6 min-h-[50px] text-center text-xs opacity-50">
+            PayPal Loading...
+        </div>
 
-        <!-- 💡 Empty Space Filler (Benefits) -->
         <div class="mt-10 p-4 rounded-2xl bg-white/5 border border-white/5">
-            <h4 id="why-title" class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-3 text-center">Why choose us?</h4>
+            <h4 id="why-title" class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-3 text-center">WHY CHOOSE US?</h4>
             <div class="grid grid-cols-2 gap-3 text-[10px]">
                 <div class="flex items-center gap-2"><span>✅</span><span id="b1">8K Resolution</span></div>
-                <div class="flex items-center gap-2"><span>✅</span><span id="b2"> Burmese AI</span></div>
+                <div class="flex items-center gap-2"><span>✅</span><span id="b2">Burmese AI</span></div>
                 <div class="flex items-center gap-2"><span>✅</span><span id="b3">Privacy First</span></div>
                 <div class="flex items-center gap-2"><span>✅</span><span id="b4">Instant Add</span></div>
             </div>
@@ -91,27 +85,27 @@
     </div>
 
     <script>
-        const PAYPAL_CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw";
+        const CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw"; 
         const WEBHOOK_URL = "https://n8n.trustporthub.com/webhook/paypal-payment-success";
         
         let currentLang = 'EN';
         let selectedCredits = 15;
+        let currency = 'MYR';
         const tg = window.Telegram.WebApp;
 
-        const RATES = { MYR: 1, MMK: 500, THB: 10, USD: 0.33 };
+        const RATES = { MYR: 1, MMK: 500, THB: 10, USD: 0.25 };
         const SYMBOLS = { MYR: 'RM', MMK: 'Ks', THB: '฿', USD: '$' };
-
         const TEXTS = {
-            EN: { title: "Choose Your Plan", p1: "Premium Pack", p2: "Enterprise Pack", p3: "Custom Pack", best: "Best Value", why: "Benefits", b1: "8K AI Quality", b2: "No Watermark", b3: "Secure Data", b4: "24/7 Service" },
-            MM: { title: "ကရက်ဒစ်ဝယ်ယူရန်", p1: "Premium အစီအစဉ်", p2: "Enterprise အစီအစဉ်", p3: "စိတ်ကြိုက်ဝယ်ရန်", best: "အသင့်တော်ဆုံး", why: "အားသာချက်များ", b1: "8K အကြည်ဓာတ်", b2: "Watermark မပါ", b3: "လုံခြုံစိတ်ချရမှု", b4: "ချက်ချင်းရရှိမည်" }
+            EN: { title: "Choose Your Plan", p1: "Premium Pack", p2: "Enterprise Pack", p3: "Custom Pack", best: "Best Value", why: "WHY CHOOSE US?", b1: "8K Resolution", b2: "Burmese AI", b3: "Privacy First", b4: "Instant Add" },
+            MM: { title: "ကရက်ဒစ်ဝယ်ယူရန်", p1: "Premium အစီအစဉ်", p2: "Enterprise အစီအစဉ်", p3: "စိတ်ကြိုက်ဝယ်ရန်", best: "အသင့်တော်ဆုံး", why: "ဘာကြောင့် ကျွန်ုပ်တို့ကို ရွေးချယ်သင့်လဲ?", b1: "8K အကြည်ဓာတ်", b2: "မြန်မာ AI", b3: "လုံခြုံစိတ်ချရမှု", b4: "ချက်ချင်းရရှိမည်" }
         };
 
         function toggleLang() { currentLang = currentLang === 'EN' ? 'MM' : 'EN'; updateUI(); }
 
         function updateUI() {
-            const curr = document.getElementById('curr-selector').value;
+            currency = document.getElementById('curr-selector').value;
             const lang = TEXTS[currentLang];
-            const sym = SYMBOLS[curr];
+            const sym = SYMBOLS[currency];
 
             document.getElementById('title-text').innerText = lang.title;
             document.getElementById('pack1-name').innerText = lang.p1;
@@ -123,10 +117,11 @@
             document.getElementById('b3').innerText = lang.b3; document.getElementById('b4').innerText = lang.b4;
             document.getElementById('lang-btn').innerText = currentLang === 'EN' ? 'မြန်မာစာ 🇲🇲' : 'English 🇺🇸';
 
-            document.getElementById('price-1').innerText = `${sym}${15 * RATES[curr]}`;
-            document.getElementById('price-2').innerText = `${sym}${50 * RATES[curr]}`;
-            document.getElementById('price-custom').innerText = `${sym}${selectedCredits * RATES[curr]}`;
-            renderPayPal();
+            document.getElementById('price-1').innerText = `${sym}${15 * RATES[currency]}`;
+            document.getElementById('price-2').innerText = `${sym}${50 * RATES[currency]}`;
+            document.getElementById('price-custom').innerText = `${sym}${selectedCredits * RATES[currency]}`;
+            
+            if (window.paypal) renderPayPal();
         }
 
         function selectPack(credits, el, isCustom) {
@@ -144,29 +139,46 @@
         }
 
         function renderPayPal() {
-            const curr = document.getElementById('curr-selector').value;
-            const payCurrency = ['USD', 'MYR', 'THB'].includes(curr) ? curr : 'USD';
-            const payPrice = (selectedCredits * (payCurrency === 'USD' ? 0.33 : RATES[payCurrency])).toFixed(2);
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
+            
+            // PayPal doesn't support MMK, so we fallback to USD for MMK selection
+            const payCurrency = (currency === 'MMK') ? 'USD' : currency;
+            const payAmount = (selectedCredits * RATES[payCurrency]).toFixed(2);
 
-            document.getElementById('paypal-button-container').innerHTML = '';
             paypal.Buttons({
-                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: payPrice, currency_code: payCurrency } }] }),
+                style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'paypal' },
+                createOrder: (data, actions) => actions.order.create({
+                    purchase_units: [{ amount: { currency_code: payCurrency, value: payAmount } }]
+                }),
                 onApprove: (data, actions) => actions.order.capture().then(details => {
-                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: tg.initDataUnsafe?.user?.id || '8251786440', credits: selectedCredits, amount: payPrice, currency: payCurrency }) });
-                    tg.showAlert(`🎉 Success! ${selectedCredits} Credits added.`);
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_id: tg.initDataUnsafe?.user?.id || 'unknown',
+                            credits: selectedCredits,
+                            amount: payAmount,
+                            currency: payCurrency
+                        })
+                    });
+                    tg.showAlert(`🎉 Success! Credits will be added to ID: ${tg.initDataUnsafe?.user?.id || 'unknown'}`);
                     tg.close();
                 })
-            }).render('#paypal-button-container');
+            }).render('#paypal-button-container').catch(err => {
+                container.innerHTML = `<p class="text-red-500 text-[10px]">Error loading PayPal. Check Client ID.</p>`;
+            });
         }
 
         function init() {
             if (tg) {
                 tg.ready(); tg.expand();
                 const user = tg.initDataUnsafe?.user;
-                if (user) document.getElementById('user-info').innerText = `${user.first_name} (ID: ${user.id})`;
+                if (user) document.getElementById('user-info').innerText = `User: ${user.first_name} (ID: ${user.id})`;
             }
+            // Load PayPal SDK only once with base currency
             const script = document.createElement('script');
-            script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=MYR`;
+            script.src = `https://www.paypal.com/sdk/js?client-id=${CLIENT_ID}&currency=MYR`;
             script.onload = updateUI;
             document.head.appendChild(script);
         }
