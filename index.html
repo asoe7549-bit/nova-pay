@@ -14,50 +14,68 @@
             --tg-theme-secondary-bg-color: #2c2c2e;
         }
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); font-family: sans-serif; margin: 0; padding: 0; }
-        .pricing-card { background-color: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative; }
+        .pricing-card { background-color: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative; transition: 0.2s; }
         .pricing-card.selected { border-color: var(--tg-theme-button-color); box-shadow: 0 0 0 2px rgba(36, 139, 207, 0.3); }
         .tag { background-color: var(--tg-theme-button-color); color: white; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 20px; position: absolute; top: -10px; right: 10px; text-transform: uppercase; }
+        input[type=range] { width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="app" class="max-w-md mx-auto p-4">
-        <header class="mb-8 pt-4">
-            <h1 class="text-xl font-bold">Nova_Banana🍌 Agency</h1>
-            <p id="user-info" class="text-xs text-gray-400">Detecting User...</p>
+        <header class="flex justify-between items-center mb-6 pt-4">
+            <div>
+                <h1 class="text-xl font-bold">Nova_Banana🍌 Agency</h1>
+                <p id="user-info" class="text-[10px] text-gray-400">Detecting User...</p>
+            </div>
+            <div class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">USD Payment</div>
         </header>
 
         <div id="packs-container">
-            <div class="pricing-card selected" onclick="selectPack(5, 15, this)">
+            <!-- Premium -->
+            <div class="pricing-card selected" onclick="selectPack(5, 15, this, false)">
                 <span class="tag">Best Value</span>
                 <div class="flex justify-between items-center">
-                    <div><h3 class="font-bold">Premium Pack</h3><p class="text-sm opacity-50">15 Credits</p></div>
-                    <div class="text-xl font-black">$5.00</div>
+                    <div class="flex items-center gap-3"><span>💎</span><div><h3 class="font-bold text-sm">Premium Pack</h3><p class="text-xs opacity-50">15 Credits</p></div></div>
+                    <div class="text-lg font-black">$5.00</div>
                 </div>
             </div>
-            <div class="pricing-card" onclick="selectPack(15, 50, this)">
-                <span class="tag">Enterprise</span>
+            
+            <!-- Agency -->
+            <div class="pricing-card" onclick="selectPack(15, 50, this, false)">
+                <span class="tag text-[8px]">Agency</span>
                 <div class="flex justify-between items-center">
-                    <div><h3 class="font-bold">Agency Pack</h3><p class="text-sm opacity-50">50 Credits</p></div>
-                    <div class="text-xl font-black">$15.00</div>
+                    <div class="flex items-center gap-3"><span>🚀</span><div><h3 class="font-bold text-sm">Enterprise Pack</h3><p class="text-xs opacity-50">50 Credits</p></div></div>
+                    <div class="text-lg font-black">$15.00</div>
+                </div>
+            </div>
+
+            <!-- Custom Pack -->
+            <div class="pricing-card" id="custom-card" onclick="selectPack(10, 30, this, true)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3"><span>⚙️</span><div><h3 class="font-bold text-sm">Custom Pack</h3><p class="text-xs opacity-50" id="custom-credits-label">30 Credits</p></div></div>
+                    <div class="text-lg font-black" id="custom-price-label">$10.00</div>
+                </div>
+                <!-- Slider Hidden by Default -->
+                <div id="slider-container" class="mt-4 hidden">
+                    <input type="range" min="3" max="300" step="3" value="30" oninput="updateSlider(this.value)">
+                    <div class="flex justify-between text-[9px] opacity-40 mt-1"><span>3 Credits</span><span>300 Credits</span></div>
                 </div>
             </div>
         </div>
 
-        <div id="paypal-button-container" class="mt-8"></div>
+        <div id="paypal-button-container" class="mt-6"></div>
     </div>
 
     <script>
-        // 🛠️ အောက်က နေရာ (၂) ခုကို အစ်ကို့ data တွေနဲ့ အစားထိုးပါ
-        const PAYPAL_CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5LknaP9FpqbpgVWyJVNQHqu0BvNw"; // အစ်ကို့ Client ID
-        const N8N_WEBHOOK_URL = "https://n8n.trustporthub.com/webhook/paypal-payment-success"; // အစ်ကို့ Production Webhook URL
-
+        const CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw";
+        const WEBHOOK_URL = "https://n8n.trustporthub.com/webhook/paypal-payment-success";
+        
         let selectedPack = { price: "5.00", credits: 15 };
         const tg = window.Telegram.WebApp;
 
         function init() {
             if (tg) {
-                tg.ready();
-                tg.expand();
+                tg.ready(); tg.expand();
                 const user = tg.initDataUnsafe?.user;
                 if (user) document.getElementById('user-info').innerText = `User: ${user.first_name} (ID: ${user.id})`;
             }
@@ -65,16 +83,35 @@
         }
 
         function loadPaypal() {
+            const old = document.getElementById('paypal-sdk'); if (old) old.remove();
             const script = document.createElement('script');
-            script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+            script.id = 'paypal-sdk';
+            script.src = `https://www.paypal.com/sdk/js?client-id=${CLIENT_ID}&currency=USD`;
             script.onload = renderPayPal;
             document.head.appendChild(script);
         }
 
-        function selectPack(price, credits, el) {
+        function selectPack(price, credits, el, isCustom) {
             document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
-            selectedPack = { price: price.toFixed(2), credits: credits };
+            
+            const slider = document.getElementById('slider-container');
+            if (isCustom) {
+                slider.classList.remove('hidden');
+                selectedPack = { price: (document.querySelector('input[type=range]').value / 3).toFixed(2), credits: parseInt(document.querySelector('input[type=range]').value) };
+            } else {
+                slider.classList.add('hidden');
+                selectedPack = { price: price.toFixed(2), credits: credits };
+            }
+            renderPayPal();
+        }
+
+        function updateSlider(val) {
+            const credits = parseInt(val);
+            const price = (credits / 3).toFixed(2);
+            document.getElementById('custom-credits-label').innerText = `${credits} Credits`;
+            document.getElementById('custom-price-label').innerText = `$${price}`;
+            selectedPack = { price: price, credits: credits };
             renderPayPal();
         }
 
@@ -82,10 +119,10 @@
             document.getElementById('paypal-button-container').innerHTML = '';
             paypal.Buttons({
                 createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{ amount: { value: selectedPack.price } }]
+                    purchase_units: [{ amount: { value: selectedPack.price }, description: `Nova AI - ${selectedPack.credits} Credits` }]
                 }),
                 onApprove: (data, actions) => actions.order.capture().then(details => {
-                    fetch(N8N_WEBHOOK_URL, {
+                    fetch(WEBHOOK_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -95,7 +132,7 @@
                             orderId: details.id
                         })
                     });
-                    tg.showAlert("Success! Credits added.");
+                    tg.showAlert(`🎉 Success! ${selectedPack.credits} Credits added to your account.`);
                     tg.close();
                 })
             }).render('#paypal-button-container');
