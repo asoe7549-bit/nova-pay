@@ -2,91 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nova_Banana🍌 Checkout</title>
+    <!-- Scripts -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         :root {
-            --tg-theme-bg-color: #1c1c1d;
-            --tg-theme-text-color: #ffffff;
-            --tg-theme-button-color: #248bcf;
-            --tg-theme-secondary-bg-color: #2c2c2e;
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #ffffff 50%, #f5f3ff 100%);
+            --tg-theme-text-color: #1f2937;
+            --accent-blue: #3b82f6;
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(255, 255, 255, 0.8);
         }
-        body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); font-family: -apple-system, sans-serif; overflow-x: hidden; }
-        .glass-card { background: rgba(44, 44, 46, 0.8); backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
-        .pricing-card.selected { border: 2px solid var(--tg-theme-button-color); transform: scale(1.02); }
-        input[type="number"] { background: #3a3a3c; color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px; width: 100%; text-align: center; }
+
+        body { 
+            background: var(--bg-gradient); 
+            color: var(--tg-theme-text-color); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Selection Styling */
+        .pricing-card.selected {
+            border: 2px solid var(--accent-blue);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .tag {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Custom Input Styling */
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            font-weight: 700;
+            color: #1f2937;
+            outline: none;
+            font-size: 18px;
+        }
     </style>
 </head>
-<body class="p-4">
+<body class="p-5">
     <div class="max-w-md mx-auto">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-6">
+        <!-- Header Section -->
+        <header class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-xl font-bold flex items-center gap-2">Nova_Banana 🍌</h1>
-                <p id="user-display" class="text-xs text-gray-400">Loading user info...</p>
+                <h1 class="text-2xl font-black text-gray-900">Nova_Banana 🍌</h1>
+                <p id="user-display" class="text-xs text-gray-500 font-medium">Detecting user...</p>
             </div>
-            <select id="currency-selector" onchange="updateCurrency(this.value)" class="bg-[#2c2c2e] text-sm p-2 rounded-lg border border-white/10 outline-none">
+            <select id="currency-selector" onchange="updateCurrency(this.value)" class="glass-card text-sm px-3 py-2 border-none outline-none font-bold">
                 <option value="MYR">🇲🇾 MYR</option>
                 <option value="USD">🇺🇸 USD</option>
             </select>
         </header>
 
-        <!-- Plans -->
+        <!-- Pricing Cards -->
         <div class="space-y-4">
             <!-- Premium -->
-            <div id="pack-premium" onclick="selectPack('premium', 15, this)" class="pricing-card glass-card p-5 cursor-pointer selected">
+            <div id="pack-premium" onclick="selectPack('premium', 15, this)" class="pricing-card glass-card cursor-pointer selected">
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">💎</span>
-                        <div><h3 class="font-bold">Premium Pack</h3><p class="text-xs opacity-60">15 Credits</p></div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-3xl">💎</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">Premium Pack</h3>
+                            <p class="text-xs text-gray-500">15 Credits</p>
+                        </div>
                     </div>
                     <div class="text-right">
-                        <div class="price-display text-xl font-black">RM 15.00</div>
-                        <p class="text-[10px] text-blue-400 font-bold uppercase">Best Value</p>
+                        <div class="price-display text-xl font-black text-gray-900">RM 15.00</div>
+                        <span class="tag">Best Value</span>
                     </div>
                 </div>
             </div>
 
             <!-- Enterprise -->
-            <div id="pack-enterprise" onclick="selectPack('enterprise', 50, this)" class="pricing-card glass-card p-5 cursor-pointer">
+            <div id="pack-enterprise" onclick="selectPack('enterprise', 50, this)" class="pricing-card glass-card cursor-pointer">
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🚀</span>
-                        <div><h3 class="font-bold">Enterprise Pack</h3><p class="text-xs opacity-60">50 Credits</p></div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-3xl">🚀</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">Enterprise Pack</h3>
+                            <p class="text-xs text-gray-500">50 Credits</p>
+                        </div>
                     </div>
                     <div class="text-right">
-                        <div class="price-display text-xl font-black">RM 50.00</div>
-                        <p class="text-[10px] text-purple-400 font-bold uppercase">Popular</p>
+                        <div class="price-display text-xl font-black text-gray-900">RM 50.00</div>
+                        <span class="tag" style="background:#fef3c7; color:#d97706;">Popular</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Custom -->
-            <div id="pack-custom" onclick="selectPack('custom', 0, this)" class="pricing-card glass-card p-5 cursor-pointer">
-                <div class="flex justify-between items-center mb-3">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">⚙️</span>
-                        <div><h3 class="font-bold">Custom Pack</h3><p class="text-xs opacity-60">Min 3 Credits</p></div>
+            <!-- Custom Pack -->
+            <div id="pack-custom" onclick="selectPack('custom', 0, this)" class="pricing-card glass-card cursor-pointer">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-4">
+                        <span class="text-3xl">⚙️</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">Custom Pack</h3>
+                            <p class="text-xs text-gray-500">Min 3 Credits</p>
+                        </div>
                     </div>
-                    <div class="text-right"><div id="custom-price-label" class="text-xl font-black">RM 3.00</div></div>
+                    <div id="custom-price-label" class="text-xl font-black text-gray-900">RM 3.00</div>
                 </div>
-                <input type="number" id="custom-input" min="3" value="3" oninput="handleCustomInput(this.value)" class="mt-2" placeholder="How many credits?">
+                <input type="number" id="custom-input" min="3" value="3" oninput="handleCustomInput(this.value)" placeholder="Enter amount">
             </div>
         </div>
 
-        <!-- PayPal Button -->
-        <div class="mt-8 text-center">
-            <p class="text-[10px] text-gray-500 mb-2">* Payments are processed in USD equivalent</p>
+        <!-- PayPal Buttons -->
+        <div class="mt-10 text-center">
+            <p class="text-[10px] text-gray-400 mb-4 font-medium italic">* Payments are processed in USD equivalent via PayPal</p>
             <div id="paypal-button-container"></div>
         </div>
     </div>
 
     <script>
-        const CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5LknaP9FpqbpgVWyJVNQHqu0BvNw";
+        // CONFIGURATION 🎯
+        const CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dcXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw";
         const WEBHOOK_URL = "https://n8n.trustporthub.com/webhook-test/paypal-payment-success";
-        const MYR_TO_USD_RATE = 0.29; // 1 MYR ≈ 0.21 USD (အစ်ကို့ အကြိုက် ပြောင်းနိုင်သည်)
+        const MYR_TO_USD_RATE = 0.29; // အစ်ကို့ပေါက်ဈေး
 
         let selectedCredits = 15;
         let displayCurrency = 'MYR';
@@ -94,7 +154,7 @@
 
         function init() {
             tg.ready(); tg.expand();
-            if(tg.initDataUnsafe.user) {
+            if(tg.initDataUnsafe?.user) {
                 document.getElementById('user-display').innerText = `${tg.initDataUnsafe.user.first_name} (ID: ${tg.initDataUnsafe.user.id})`;
             }
             loadPaypalScript();
@@ -108,7 +168,7 @@
         }
 
         function handleCustomInput(val) {
-            let v = parseInt(val);
+            let v = parseInt(val) || 3;
             if (v < 3) v = 3;
             selectedCredits = v;
             updateUI();
@@ -120,19 +180,18 @@
             el.classList.add('selected');
             if(type !== 'custom') {
                 selectedCredits = credits;
-                document.getElementById('custom-input').value = 3;
             } else {
-                selectedCredits = parseInt(document.getElementById('custom-input').value);
+                selectedCredits = parseInt(document.getElementById('custom-input').value) || 3;
             }
             updateUI();
             renderPayPal();
         }
 
         function updateUI() {
-            const getP = (c) => displayCurrency === 'MYR' ? `RM ${c.toFixed(2)}` : `$ ${(c * MYR_TO_USD_RATE).toFixed(2)}`;
-            document.querySelector('#pack-premium .price-display').innerText = getP(15);
-            document.querySelector('#pack-enterprise .price-display').innerText = getP(50);
-            document.getElementById('custom-price-label').innerText = getP(selectedCredits);
+            const format = (c) => displayCurrency === 'MYR' ? `RM ${c.toFixed(2)}` : `$ ${(c * MYR_TO_USD_RATE).toFixed(2)}`;
+            document.querySelector('#pack-premium .price-display').innerText = format(15);
+            document.querySelector('#pack-enterprise .price-display').innerText = format(50);
+            document.getElementById('custom-price-label').innerText = format(selectedCredits);
         }
 
         function loadPaypalScript() {
@@ -148,21 +207,26 @@
             const usdAmount = (selectedCredits * MYR_TO_USD_RATE).toFixed(2);
 
             paypal.Buttons({
+                style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'paypal' },
                 createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{ amount: { value: usdAmount, currency_code: 'USD' }, description: `Nova AI - ${selectedCredits} Credits` }]
+                    purchase_units: [{ 
+                        amount: { value: usdAmount, currency_code: 'USD' },
+                        description: `Nova AI Agency - ${selectedCredits} Credits` 
+                    }]
                 }),
                 onApprove: (data, actions) => actions.order.capture().then(details => {
                     fetch(WEBHOOK_URL, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
-                            user_id: tg.initDataUnsafe.user?.id || 'unknown',
+                            user_id: tg.initDataUnsafe?.user?.id || 'unknown',
                             credits: selectedCredits,
                             usd_paid: usdAmount,
-                            orderId: details.id
+                            orderId: details.id,
+                            payer_name: details.payer.name.given_name
                         })
                     });
-                    tg.showAlert(`🎉 Success! ${selectedCredits} Credits have been added.`);
+                    tg.showAlert(`🎉 Success! ${selectedCredits} Credits added to your account.`);
                     tg.close();
                 })
             }).render('#paypal-button-container');
