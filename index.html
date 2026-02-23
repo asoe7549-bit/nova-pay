@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova_Banana🍌 Pricing</title>
+    <title>Nova AI Agency - Pricing</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,128 +14,161 @@
             --tg-theme-secondary-bg-color: #2c2c2e;
         }
         body { background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); font-family: sans-serif; margin: 0; padding: 0; }
-        .pricing-card { background-color: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative; transition: 0.2s; }
-        .pricing-card.selected { border-color: var(--tg-theme-button-color); box-shadow: 0 0 0 2px rgba(36, 139, 207, 0.3); }
-        .tag { background-color: var(--tg-theme-button-color); color: white; font-size: 10px; font-weight: bold; padding: 4px 8px; border-radius: 20px; position: absolute; top: -10px; right: 10px; text-transform: uppercase; }
-        input[type=range] { width: 100%; cursor: pointer; }
+        .pricing-card { background-color: var(--tg-theme-secondary-bg-color); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative; transition: 0.2s; }
+        .pricing-card.selected { border-color: var(--tg-theme-button-color); box-shadow: 0 0 8px rgba(36, 139, 207, 0.4); }
+        .tag { background-color: var(--tg-theme-button-color); color: white; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 20px; position: absolute; top: -8px; right: 10px; text-transform: uppercase; }
+        input[type=range] { width: 100%; accent-color: var(--tg-theme-button-color); }
     </style>
 </head>
 <body>
-    <div id="app" class="max-w-md mx-auto p-4">
-        <header class="flex justify-between items-center mb-6 pt-4">
-            <div>
-                <h1 class="text-xl font-bold">Nova_Banana🍌 Agency</h1>
-                <p id="user-info" class="text-[10px] text-gray-400">Detecting User...</p>
+    <div id="app" class="max-w-md mx-auto p-4 pb-10">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6 pt-2">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">Nova_Banana🍌</h1>
+                    <p id="user-info" class="text-[10px] text-gray-400">Detecting User...</p>
+                </div>
             </div>
-            <div class="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">USD Payment</div>
+            <div class="flex gap-2">
+                <button onclick="toggleLang()" id="lang-btn" class="text-[10px] bg-white/10 px-2 py-1 rounded">Burmese 🇲🇲</button>
+                <select id="curr-selector" onchange="updateUI()" class="bg-[#2c2c2e] text-[10px] px-1 py-1 rounded border border-white/10">
+                    <option value="MYR">MYR (RM)</option>
+                    <option value="MMK">MMK (Ks)</option>
+                    <option value="THB">THB (฿)</option>
+                    <option value="USD">USD ($)</option>
+                </select>
+            </div>
         </header>
+
+        <h2 id="title-text" class="text-xl font-bold text-center mb-6">Choose Your Plan</h2>
 
         <div id="packs-container">
             <!-- Premium -->
-            <div class="pricing-card selected" onclick="selectPack(5, 15, this, false)">
-                <span class="tag">Best Value</span>
+            <div class="pricing-card selected" onclick="selectPack(15, this, false)">
+                <span class="tag" id="tag-best">Best Value</span>
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3"><span>💎</span><div><h3 class="font-bold text-sm">Premium Pack</h3><p class="text-xs opacity-50">15 Credits</p></div></div>
-                    <div class="text-lg font-black">$5.00</div>
+                    <div class="flex items-center gap-3"><span>💎</span><div><h3 class="font-bold text-sm" id="pack1-name">Premium Pack</h3><p class="text-xs opacity-50">15 Credits</p></div></div>
+                    <div id="price-1" class="text-lg font-black"></div>
                 </div>
             </div>
             
-            <!-- Agency -->
-            <div class="pricing-card" onclick="selectPack(15, 50, this, false)">
-                <span class="tag text-[8px]">Agency</span>
+            <!-- Enterprise -->
+            <div class="pricing-card" onclick="selectPack(50, this, false)">
+                <span class="tag" id="tag-agency">Agency</span>
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3"><span>🚀</span><div><h3 class="font-bold text-sm">Enterprise Pack</h3><p class="text-xs opacity-50">50 Credits</p></div></div>
-                    <div class="text-lg font-black">$15.00</div>
+                    <div class="flex items-center gap-3"><span>🚀</span><div><h3 class="font-bold text-sm" id="pack2-name">Enterprise Pack</h3><p class="text-xs opacity-50">50 Credits</p></div></div>
+                    <div id="price-2" class="text-lg font-black"></div>
                 </div>
             </div>
 
             <!-- Custom Pack -->
-            <div class="pricing-card" id="custom-card" onclick="selectPack(10, 30, this, true)">
+            <div class="pricing-card" id="custom-card" onclick="selectPack(100, this, true)">
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3"><span>⚙️</span><div><h3 class="font-bold text-sm">Custom Pack</h3><p class="text-xs opacity-50" id="custom-credits-label">30 Credits</p></div></div>
-                    <div class="text-lg font-black" id="custom-price-label">$10.00</div>
+                    <div class="flex items-center gap-3"><span>⚙️</span><div><h3 class="font-bold text-sm" id="pack3-name">Custom Pack</h3><p class="text-xs opacity-50" id="custom-credits-label">100 Credits</p></div></div>
+                    <div id="price-custom" class="text-lg font-black"></div>
                 </div>
-                <!-- Slider Hidden by Default -->
                 <div id="slider-container" class="mt-4 hidden">
-                    <input type="range" min="3" max="300" step="3" value="30" oninput="updateSlider(this.value)">
-                    <div class="flex justify-between text-[9px] opacity-40 mt-1"><span>3 Credits</span><span>300 Credits</span></div>
+                    <input type="range" min="10" max="500" step="10" value="100" oninput="updateSlider(this.value)">
+                    <div class="flex justify-between text-[9px] opacity-40 mt-1"><span>10 Credits</span><span>500 Credits</span></div>
                 </div>
             </div>
         </div>
 
         <div id="paypal-button-container" class="mt-6"></div>
+
+        <!-- 💡 Empty Space Filler (Benefits) -->
+        <div class="mt-10 p-4 rounded-2xl bg-white/5 border border-white/5">
+            <h4 id="why-title" class="text-xs font-bold uppercase tracking-widest text-blue-400 mb-3 text-center">Why choose us?</h4>
+            <div class="grid grid-cols-2 gap-3 text-[10px]">
+                <div class="flex items-center gap-2"><span>✅</span><span id="b1">8K Resolution</span></div>
+                <div class="flex items-center gap-2"><span>✅</span><span id="b2"> Burmese AI</span></div>
+                <div class="flex items-center gap-2"><span>✅</span><span id="b3">Privacy First</span></div>
+                <div class="flex items-center gap-2"><span>✅</span><span id="b4">Instant Add</span></div>
+            </div>
+        </div>
+        <p class="text-center text-[9px] opacity-30 mt-6">Secure Payment via PayPal & Card</p>
     </div>
 
     <script>
-        const CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw";
+        const PAYPAL_CLIENT_ID = "AUaBk-B7Dtj1QGqnp6FtEOKM1hL_dCxXw5YTjoRTGMd1c3EMQRaK5Lknap9FpqbpgVWyJVNQHqu0BvNw";
         const WEBHOOK_URL = "https://n8n.trustporthub.com/webhook/paypal-payment-success";
         
-        let selectedPack = { price: "5.00", credits: 15 };
+        let currentLang = 'EN';
+        let selectedCredits = 15;
         const tg = window.Telegram.WebApp;
+
+        const RATES = { MYR: 1, MMK: 500, THB: 10, USD: 0.33 };
+        const SYMBOLS = { MYR: 'RM', MMK: 'Ks', THB: '฿', USD: '$' };
+
+        const TEXTS = {
+            EN: { title: "Choose Your Plan", p1: "Premium Pack", p2: "Enterprise Pack", p3: "Custom Pack", best: "Best Value", why: "Benefits", b1: "8K AI Quality", b2: "No Watermark", b3: "Secure Data", b4: "24/7 Service" },
+            MM: { title: "ကရက်ဒစ်ဝယ်ယူရန်", p1: "Premium အစီအစဉ်", p2: "Enterprise အစီအစဉ်", p3: "စိတ်ကြိုက်ဝယ်ရန်", best: "အသင့်တော်ဆုံး", why: "အားသာချက်များ", b1: "8K အကြည်ဓာတ်", b2: "Watermark မပါ", b3: "လုံခြုံစိတ်ချရမှု", b4: "ချက်ချင်းရရှိမည်" }
+        };
+
+        function toggleLang() { currentLang = currentLang === 'EN' ? 'MM' : 'EN'; updateUI(); }
+
+        function updateUI() {
+            const curr = document.getElementById('curr-selector').value;
+            const lang = TEXTS[currentLang];
+            const sym = SYMBOLS[curr];
+
+            document.getElementById('title-text').innerText = lang.title;
+            document.getElementById('pack1-name').innerText = lang.p1;
+            document.getElementById('pack2-name').innerText = lang.p2;
+            document.getElementById('pack3-name').innerText = lang.p3;
+            document.getElementById('tag-best').innerText = lang.best;
+            document.getElementById('why-title').innerText = lang.why;
+            document.getElementById('b1').innerText = lang.b1; document.getElementById('b2').innerText = lang.b2;
+            document.getElementById('b3').innerText = lang.b3; document.getElementById('b4').innerText = lang.b4;
+            document.getElementById('lang-btn').innerText = currentLang === 'EN' ? 'မြန်မာစာ 🇲🇲' : 'English 🇺🇸';
+
+            document.getElementById('price-1').innerText = `${sym}${15 * RATES[curr]}`;
+            document.getElementById('price-2').innerText = `${sym}${50 * RATES[curr]}`;
+            document.getElementById('price-custom').innerText = `${sym}${selectedCredits * RATES[curr]}`;
+            renderPayPal();
+        }
+
+        function selectPack(credits, el, isCustom) {
+            document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedCredits = credits;
+            document.getElementById('slider-container').classList.toggle('hidden', !isCustom);
+            updateUI();
+        }
+
+        function updateSlider(val) {
+            selectedCredits = parseInt(val);
+            document.getElementById('custom-credits-label').innerText = `${val} Credits`;
+            updateUI();
+        }
+
+        function renderPayPal() {
+            const curr = document.getElementById('curr-selector').value;
+            const payCurrency = ['USD', 'MYR', 'THB'].includes(curr) ? curr : 'USD';
+            const payPrice = (selectedCredits * (payCurrency === 'USD' ? 0.33 : RATES[payCurrency])).toFixed(2);
+
+            document.getElementById('paypal-button-container').innerHTML = '';
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: payPrice, currency_code: payCurrency } }] }),
+                onApprove: (data, actions) => actions.order.capture().then(details => {
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: tg.initDataUnsafe?.user?.id || '8251786440', credits: selectedCredits, amount: payPrice, currency: payCurrency }) });
+                    tg.showAlert(`🎉 Success! ${selectedCredits} Credits added.`);
+                    tg.close();
+                })
+            }).render('#paypal-button-container');
+        }
 
         function init() {
             if (tg) {
                 tg.ready(); tg.expand();
                 const user = tg.initDataUnsafe?.user;
-                if (user) document.getElementById('user-info').innerText = `User: ${user.first_name} (ID: ${user.id})`;
+                if (user) document.getElementById('user-info').innerText = `${user.first_name} (ID: ${user.id})`;
             }
-            loadPaypal();
-        }
-
-        function loadPaypal() {
-            const old = document.getElementById('paypal-sdk'); if (old) old.remove();
             const script = document.createElement('script');
-            script.id = 'paypal-sdk';
-            script.src = `https://www.paypal.com/sdk/js?client-id=${CLIENT_ID}&currency=USD`;
-            script.onload = renderPayPal;
+            script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=MYR`;
+            script.onload = updateUI;
             document.head.appendChild(script);
-        }
-
-        function selectPack(price, credits, el, isCustom) {
-            document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            
-            const slider = document.getElementById('slider-container');
-            if (isCustom) {
-                slider.classList.remove('hidden');
-                selectedPack = { price: (document.querySelector('input[type=range]').value / 3).toFixed(2), credits: parseInt(document.querySelector('input[type=range]').value) };
-            } else {
-                slider.classList.add('hidden');
-                selectedPack = { price: price.toFixed(2), credits: credits };
-            }
-            renderPayPal();
-        }
-
-        function updateSlider(val) {
-            const credits = parseInt(val);
-            const price = (credits / 3).toFixed(2);
-            document.getElementById('custom-credits-label').innerText = `${credits} Credits`;
-            document.getElementById('custom-price-label').innerText = `$${price}`;
-            selectedPack = { price: price, credits: credits };
-            renderPayPal();
-        }
-
-        function renderPayPal() {
-            document.getElementById('paypal-button-container').innerHTML = '';
-            paypal.Buttons({
-                createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{ amount: { value: selectedPack.price }, description: `Nova AI - ${selectedPack.credits} Credits` }]
-                }),
-                onApprove: (data, actions) => actions.order.capture().then(details => {
-                    fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            user_id: tg.initDataUnsafe?.user?.id || 'unknown',
-                            amount: selectedPack.price,
-                            credits: selectedPack.credits,
-                            orderId: details.id
-                        })
-                    });
-                    tg.showAlert(`🎉 Success! ${selectedPack.credits} Credits added to your account.`);
-                    tg.close();
-                })
-            }).render('#paypal-button-container');
         }
         init();
     </script>
